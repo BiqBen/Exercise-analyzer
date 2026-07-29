@@ -1,4 +1,4 @@
-from app.angle_calculator import calculate_angle
+from app.pose.angle_calculator import calculate_angle
 
 
 angle = calculate_angle(

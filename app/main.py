@@ -1,6 +1,12 @@
-print("🚀 Projekt läuft!")
+from app.gui.main_window import ExerciseAnalyzerApp
 
-def add(a, b):
-    return a + b
 
-print(add(2, 3))
+def main():
+
+    app = ExerciseAnalyzerApp()
+
+    app.mainloop()
+
+
+if __name__ == "__main__":
+    main()
