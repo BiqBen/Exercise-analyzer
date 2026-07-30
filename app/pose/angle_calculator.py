@@ -31,7 +31,7 @@ def calculate_angle(a, b, c):
 
     return math.degrees(math.acos(cos_angle))
 
-def calculate_torso_angle(shoulder, hip):
+def calculate_vertical_torso_angle(shoulder, hip):
     """
     Berechnet die Oberkörperneigung relativ zur Vertikalen.
 
@@ -50,5 +50,30 @@ def calculate_torso_angle(shoulder, hip):
     angle = math.degrees(
         math.atan2(abs(dx), abs(dy))
     )
+
+    return angle
+
+
+def calculate_horizontal_body_angle(shoulder, ankle):
+    """
+    Berechnet die Körperneigung relativ zur Horizontalen.
+
+    Schulter -> Knöchel bildet die Körperlinie.
+
+    Rückgabe:
+    Winkel in Grad
+
+    0°   = perfekt horizontal (Push-up Position)
+    90°  = vertikal stehend
+    """
+
+    dx = ankle.x - shoulder.x
+    dy = ankle.y - shoulder.y
+
+
+    angle = math.degrees(
+        math.atan2(abs(dy), abs(dx))
+    )
+
 
     return angle

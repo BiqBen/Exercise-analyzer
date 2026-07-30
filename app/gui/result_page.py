@@ -4,7 +4,8 @@ import cv2
 from PIL import Image
 
 from app.visualization.video_visualizer import create_overlay_frame
-from app.visualization.metric_config import METRICS
+from app.analysis.squat.metrics import SQUAT_METRICS
+from app.analysis.pushup.metrics import PUSHUP_METRICS
 from app.visualization.metric_widgets import create_metric_row
 
 
@@ -17,7 +18,8 @@ class ResultPage(ctk.CTkFrame):
             controller,
             results,
             frames,
-            fps
+            fps,
+            exercise
     ):
 
         super().__init__(parent)
@@ -26,6 +28,8 @@ class ResultPage(ctk.CTkFrame):
         self.controller = controller
 
         self.results = results
+
+        self.exercise = exercise
 
         self.frames = frames
 
@@ -44,7 +48,7 @@ class ResultPage(ctk.CTkFrame):
 
         title = ctk.CTkLabel(
             self,
-            text="SQUAT ANALYSIS RESULTS",
+            text=f"{self.exercise.upper()} ANALYSIS RESULTS",
             font=ctk.CTkFont(
                 size=26,
                 weight="bold"
@@ -110,6 +114,56 @@ class ResultPage(ctk.CTkFrame):
             pady=20
         )
 
+        # -------------------------------------
+        # Live Analyse
+        # -------------------------------------
+
+        self.info_frame = ctk.CTkFrame(
+            self.video_frame
+        )
+
+        self.info_frame.pack(
+            fill="x",
+            padx=20,
+            pady=10
+        )
+
+
+        self.frame_label = ctk.CTkLabel(
+            self.info_frame,
+            text="Frame: 0"
+        )
+
+        self.frame_label.pack(
+            anchor="w",
+            padx=10,
+            pady=3
+        )
+
+
+        self.rep_label = ctk.CTkLabel(
+            self.info_frame,
+            text="Repetition: -"
+        )
+
+        self.rep_label.pack(
+            anchor="w",
+            padx=10,
+            pady=3
+        )
+
+
+        self.phase_label = ctk.CTkLabel(
+            self.info_frame,
+            text="Phase: Idle"
+        )
+
+        self.phase_label.pack(
+            anchor="w",
+            padx=10,
+            pady=3
+        )
+
 
         self.update_video()
 
@@ -166,7 +220,7 @@ class ResultPage(ctk.CTkFrame):
 
 
         image.thumbnail(
-            (700,500)
+            (700, 500)
         )
 
 
@@ -186,7 +240,21 @@ class ResultPage(ctk.CTkFrame):
 
         self.video_label.image = photo
 
+
+
+        # -------------------------------------
+        # Live Bewegungsstatus aktualisieren
+        # -------------------------------------
+
+        self.update_status()
+
+
+
+        # Nächster Frame
+
         self.current_frame += 1
+
+
 
         delay = int(
             1000 / self.fps
@@ -196,6 +264,72 @@ class ResultPage(ctk.CTkFrame):
         self.after(
             delay,
             self.update_video
+        )
+
+    def update_status(self):
+
+
+        current = self.current_frame
+
+
+        repetition = "-"
+        phase = "Idle"
+
+
+
+        for i, result in enumerate(self.results):
+
+
+            start = result["frames"]["start"]
+            bottom = result["frames"]["bottom"]
+            end = result["frames"]["end"]
+
+
+
+            if start <= current <= end:
+
+
+                repetition = (
+                    f"{i+1}/{len(self.results)}"
+                )
+
+
+                if current < bottom:
+
+                    phase = "Descending"
+
+
+                else:
+
+                    phase = "Ascending"
+
+
+
+                break
+
+
+
+        self.frame_label.configure(
+            text=(
+                f"Frame: "
+                f"{current}/{len(self.frames)-1}"
+            )
+        )
+
+
+        self.rep_label.configure(
+            text=(
+                f"Repetition: "
+                f"{repetition}"
+            )
+        )
+
+
+        self.phase_label.configure(
+            text=(
+                f"Phase: "
+                f"{phase}"
+            )
         )
 
 
@@ -289,8 +423,21 @@ class ResultPage(ctk.CTkFrame):
         )
 
 
+        if self.exercise == "Squat":
 
-        for metric in METRICS:
+            metrics_config = SQUAT_METRICS
+
+
+        elif self.exercise == "Push-up":
+
+            metrics_config = PUSHUP_METRICS
+
+
+        else:
+
+            metrics_config = []
+
+        for metric in metrics_config:
 
 
             create_metric_row(

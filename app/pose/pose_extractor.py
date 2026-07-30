@@ -33,4 +33,10 @@ def extract_landmarks(results):
         # Oberkörper
         "left_shoulder": lm(11),
         "right_shoulder": lm(12),
+
+        # Arme
+        "left_elbow": lm(13),
+        "right_elbow": lm(14),
+        "left_wrist": lm(15),
+        "right_wrist": lm(16),
     }

@@ -1,6 +1,5 @@
 from app.gui.main_window import ExerciseAnalyzerApp
 
-
 def main():
 
     app = ExerciseAnalyzerApp()

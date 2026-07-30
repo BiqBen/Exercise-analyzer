@@ -9,10 +9,9 @@ import cv2
 
 from app.pose.pose_detector import PoseDetector
 from app.pose.pose_extractor import extract_landmarks
-from app.analysis.squat_analyzer import analyze_squat
 
 
-def analyze_video(video_path):
+def analyze_video(video_path, analyzer_function):
 
     cap = cv2.VideoCapture(video_path)
 
@@ -34,22 +33,28 @@ def analyze_video(video_path):
         results = detector.process(frame)
 
 
+        analysis = None
+        landmarks = None
+
+
         if results.pose_landmarks:
 
-            # Landmarks extrahieren
             landmarks = extract_landmarks(results)
 
-            # Biomechanische Analyse
-            analysis = analyze_squat(landmarks)
-
-            frames.append(
-                {
-                    "frame": frame,
-                    "results": results,
-                    "landmarks": landmarks,
-                    "analysis": analysis
-                }
+            analysis = analyzer_function(
+                landmarks
             )
+
+
+        frames.append(
+            {
+                "frame_index": len(frames),
+                "frame": frame,
+                "results": results,
+                "landmarks": landmarks,
+                "analysis": analysis
+            }
+        )
 
 
     cap.release()

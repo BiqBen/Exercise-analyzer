@@ -2,8 +2,12 @@ import customtkinter as ctk
 from tkinter import filedialog
 
 from app.analysis.video_analyzer import analyze_video
-from app.analysis.repetition_detector import detect_repetitions
-from app.analysis.repetition_analyzer import analyze_repetition
+from app.analysis.squat.pose_analyzer import analyze_squat_pose
+from app.analysis.pushup.pose_analyzer import analyze_pushup_pose
+from app.analysis.squat.repetition_detector import detect_squat_repetitions
+from app.analysis.pushup.repetition_detector import detect_pushup_repetitions
+from app.analysis.squat.repetition_analyzer import analyze_squat_repetition
+from app.analysis.pushup.repetition_analyzer import analyze_pushup_repetition
 
 
 
@@ -193,7 +197,8 @@ class HomePage(ctk.CTkFrame):
         if exercise == "Squat":
 
             frames, fps = analyze_video(
-                self.video_path
+                self.video_path,
+                analyze_squat_pose
             )
 
 
@@ -202,7 +207,7 @@ class HomePage(ctk.CTkFrame):
             print(f"FPS: {fps}")
 
 
-            repetitions = detect_repetitions(
+            repetitions = detect_squat_repetitions(
                 frames
             )
 
@@ -217,7 +222,7 @@ class HomePage(ctk.CTkFrame):
 
             for repetition in repetitions:
 
-                result = analyze_repetition(
+                result = analyze_squat_repetition(
                     frames,
                     repetition,
                     fps
@@ -229,5 +234,58 @@ class HomePage(ctk.CTkFrame):
             self.controller.show_results(
                 results,
                 frames,
-                fps
+                fps,
+                exercise
             )
+
+        elif exercise == "Push Up":
+        
+                    frames, fps = analyze_video(
+                        self.video_path,
+                        analyze_pushup_pose
+                    )
+        
+        
+                    print("Analyse abgeschlossen")
+                    print(f"Frames analysiert: {len(frames)}")
+                    print(f"FPS: {fps}")
+        
+        
+                    repetitions = detect_pushup_repetitions(
+                        frames,
+                        fps
+                    )
+        
+                    for i, result in enumerate(repetitions):
+
+                        print(
+                            i,
+                            frames[result["start"]]["frame_index"],
+                            frames[result["bottom"]]["frame_index"],    
+                        )
+
+                    print(
+                        f"Wiederholungen erkannt: {len(repetitions)}"
+                    )
+        
+        
+                    results = []
+        
+        
+                    for repetition in repetitions:
+        
+                        result = analyze_pushup_repetition(
+                            frames,
+                            repetition,
+                            fps
+                        )
+        
+                        results.append(result)
+        
+        
+                    self.controller.show_results(
+                        results,
+                        frames,
+                        fps,
+                        exercise
+                    )

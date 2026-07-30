@@ -84,7 +84,8 @@ class ExerciseAnalyzerApp(ctk.CTk):
             self,
             results,
             frames,
-            fps
+            fps,
+            exercise
     ):
 
         self.clear_page()
@@ -95,7 +96,8 @@ class ExerciseAnalyzerApp(ctk.CTk):
             self,
             results,
             frames,
-            fps
+            fps,
+            exercise
         )
 
 
