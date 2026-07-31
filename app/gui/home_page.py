@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import filedialog
+from functools import partial
 
 from app.analysis.video_analyzer import analyze_video
 from app.analysis.squat.pose_analyzer import analyze_squat_pose
@@ -196,6 +197,7 @@ class HomePage(ctk.CTkFrame):
 
         if exercise == "Squat":
 
+            # Add Squat visibility logic
             frames, fps = analyze_video(
                 self.video_path,
                 analyze_squat_pose
@@ -239,11 +241,24 @@ class HomePage(ctk.CTkFrame):
             )
 
         elif exercise == "Push Up":
-        
+
+                    """Testing the pushup analysis with visibility consideration"""
+                    pushup_analyzer = partial(
+                        analyze_pushup_pose,
+                        use_visibility=True
+                    )
+
+                    frames, fps = analyze_video(
+                        self.video_path,
+                        pushup_analyzer
+                    )
+
+                    """
                     frames, fps = analyze_video(
                         self.video_path,
                         analyze_pushup_pose
                     )
+                    """
         
         
                     print("Analyse abgeschlossen")

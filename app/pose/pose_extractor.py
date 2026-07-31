@@ -17,7 +17,8 @@ def extract_landmarks(results):
         return Landmark(
             x=landmarks[i].x,
             y=landmarks[i].y,
-            z=landmarks[i].z
+            z=landmarks[i].z,
+            visibility=landmarks[i].visibility
         )
 
     return {

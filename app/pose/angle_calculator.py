@@ -6,9 +6,9 @@
 
 import math
 
-def calculate_angle(a, b, c):
+def calculate_angle(a, b, c, return_visibility=False):
     """
-    Berechnet Winkel zwischen 3 Landmarks
+    Berechnet Winkel zwischen 3 Landmarks, gewichtet auf visibility.
     a, b, c = Landmark-Objekte
     """
 
@@ -28,6 +28,10 @@ def calculate_angle(a, b, c):
 
     cos_angle = dot / (mag_ba * mag_bc)
     cos_angle = max(-1.0, min(1.0, cos_angle))
+
+    #print(a.visibility, b.visibility, c.visibility)
+    if return_visibility:
+        return math.degrees(math.acos(cos_angle)), min(a.visibility, b.visibility, c.visibility)
 
     return math.degrees(math.acos(cos_angle))
 

@@ -3,7 +3,6 @@
 - Erzeugung von Frames mit Pose Overlay
 """
 
-import cv2
 import mediapipe as mp
 
 

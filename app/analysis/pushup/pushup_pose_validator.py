@@ -33,10 +33,10 @@ def is_pushup_position(analysis):
         )
 
 
-        hip_shoulder_elbow = (
-            analysis["pushup"]
+        shoulder_angle = (
+            analysis["shoulder"]
             ["measurements"]
-            ["hip_shoulder_elbow"]
+            ["average_shoulder_angle"]
         )
 
 
@@ -47,7 +47,7 @@ def is_pushup_position(analysis):
         )
 
         print(
-            f"body={body_angle:.1f}, hip_shoulder_elbow={hip_shoulder_elbow:.1f}, arm={arm_angle:.1f}"
+            f"body={body_angle:.1f}, average_shoulder_angle={shoulder_angle:.1f}, arm={arm_angle:.1f}"
         )
 
 
@@ -75,7 +75,7 @@ def is_pushup_position(analysis):
     if not (
         MIN_SHOULDER_HIP_ELBOW
         <=
-        hip_shoulder_elbow
+        shoulder_angle
         <=
         MAX_SHOULDER_HIP_ELBOW
     ):

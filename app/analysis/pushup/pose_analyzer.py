@@ -8,7 +8,7 @@ from app.pose.angle_calculator import calculate_angle
 from app.pose.angle_calculator import calculate_horizontal_body_angle
 
 
-def analyze_pushup_pose(landmarks):
+def analyze_pushup_pose(landmarks, use_visibility = False):
 
 
     # -----------------------------
@@ -16,24 +16,44 @@ def analyze_pushup_pose(landmarks):
     # Schulter - Ellenbogen - Hand
     # -----------------------------
 
-    left_elbow = calculate_angle(
+    left_elbow_angle = calculate_angle(
         landmarks["left_shoulder"],
         landmarks["left_elbow"],
         landmarks["left_wrist"]
     )
 
-
-    right_elbow = calculate_angle(
+    right_elbow_angle = calculate_angle(
         landmarks["right_shoulder"],
         landmarks["right_elbow"],
         landmarks["right_wrist"]
     )
 
+    left_elbow_visibility = min(
+        landmarks["left_shoulder"].visibility,
+        landmarks["left_elbow"].visibility,
+        landmarks["left_wrist"].visibility
+    )
 
-    average_elbow = (
-        left_elbow + right_elbow
+    right_elbow_visibility = min(
+        landmarks["right_shoulder"].visibility,
+        landmarks["right_elbow"].visibility,
+        landmarks["right_wrist"].visibility
+    )
+
+    # gewichteter Mittelwert
+    average_elbow_angle = (
+        left_elbow_angle * left_elbow_visibility +
+        right_elbow_angle * right_elbow_visibility
+    ) / (
+        left_elbow_visibility +
+        right_elbow_visibility
+    )
+
+    """
+    average_elbow_angle = (
+        left_elbow_angle + right_elbow_angle
     ) / 2
-
+    """
 
 
     # -----------------------------
@@ -66,23 +86,23 @@ def analyze_pushup_pose(landmarks):
     # Hüfte ---- Schulter ---- Ellenbogen
     # -----------------------------
 
-    left_hip_shoulder_elbow = calculate_angle(
+    left_shoulder_angle = calculate_angle(
         landmarks["left_hip"],
         landmarks["left_shoulder"],
         landmarks["left_elbow"]
     )
 
 
-    right_hip_shoulder_elbow = calculate_angle(
+    right_shoulder_angle = calculate_angle(
         landmarks["right_hip"],
         landmarks["right_shoulder"],
         landmarks["right_elbow"]
     )
 
 
-    average_hip_shoulder_elbow = (
-        left_hip_shoulder_elbow +
-        right_hip_shoulder_elbow
+    average_shoulder_angle = (
+        left_shoulder_angle +
+        right_shoulder_angle
     ) / 2
 
 
@@ -94,9 +114,9 @@ def analyze_pushup_pose(landmarks):
 
             "measurements": {
 
-                "left_angle": left_elbow,
-                "right_angle": right_elbow,
-                "average_angle": average_elbow
+                "left_angle": left_elbow_angle,
+                "right_angle": right_elbow_angle,
+                "average_angle": average_elbow_angle
 
             }
         },
@@ -116,18 +136,18 @@ def analyze_pushup_pose(landmarks):
 
 
 
-        "pushup": {
+        "shoulder": {
 
             "measurements": {
 
-                "left_hip_shoulder_elbow":
-                    left_hip_shoulder_elbow,
+                "left_shoulder_angle":
+                    left_shoulder_angle,
 
-                "right_hip_shoulder_elbow":
-                    right_hip_shoulder_elbow,
+                "right_shoulder_angle":
+                    right_shoulder_angle,
 
-                "hip_shoulder_elbow":
-                    average_hip_shoulder_elbow
+                "average_shoulder_angle":
+                    average_shoulder_angle
 
             }
         }
