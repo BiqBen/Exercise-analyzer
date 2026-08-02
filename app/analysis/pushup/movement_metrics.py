@@ -147,26 +147,6 @@ def extract_pushup_metrics(frames, repetition, fps):
     bottom_time = len(bottom_frames) / fps
 
     # -----------------------------------------
-    # Symmetrie
-    # -----------------------------------------
-
-    elbow_symmetry = np.mean([
-        abs(l - r)
-        for l, r in zip(
-            left_elbow_angles,
-            right_elbow_angles
-        )
-    ])
-
-    body_symmetry = np.mean([
-        abs(l - r)
-        for l, r in zip(
-            left_body_angles,
-            right_body_angles
-        )
-    ])
-
-    # -----------------------------------------
     # Rückgabe
     # -----------------------------------------
 
@@ -198,8 +178,4 @@ def extract_pushup_metrics(frames, repetition, fps):
             "ascent": ascent_velocity,
         },
 
-        "stability": {
-            "elbow_difference": elbow_symmetry,
-            "body_difference": body_symmetry,
-        },
     }

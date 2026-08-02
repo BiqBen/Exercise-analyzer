@@ -21,7 +21,7 @@ PUSHUP_METRICS = [
     {
         "title": "Body Line Angle",
         "category": "body",
-        "key": "maximum_deviation",
+        "key": "maximum_angle",
         "unit": "°",
 
         "min":0,
@@ -39,16 +39,16 @@ PUSHUP_METRICS = [
 
 
     {
-        "title": "Push-up Depth",
-        "category":"depth",
-        "key":"difference",
+        "title": "Range of Motion",
+        "category":"elbow",
+        "key":"range_of_motion",
 
         "unit":"",
         
-        "min":0,
-        "max":1,
+        "min":50,
+        "max":170,
 
-        "optimal":(0.3,0.7),
+        "optimal":(110,150),
 
         "show_scale":True
     },

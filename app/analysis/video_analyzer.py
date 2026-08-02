@@ -13,6 +13,8 @@ from app.pose.pose_extractor import extract_landmarks
 
 def analyze_video(video_path, analyzer_function):
 
+    MAX_SIZE = 640
+
     cap = cv2.VideoCapture(video_path)
 
     fps = cap.get(cv2.CAP_PROP_FPS)
@@ -29,6 +31,28 @@ def analyze_video(video_path, analyzer_function):
         if not ret:
             break
 
+        # -------------------------
+        # Frame verkleinern
+        # -------------------------
+
+        height, width = frame.shape[:2]
+
+        max_dim = max(width, height)
+
+        if max_dim > MAX_SIZE:
+
+            scale = MAX_SIZE / max_dim
+
+            frame = cv2.resize(
+                frame,
+                (
+                    int(width * scale),
+                    int(height * scale)
+                ),
+                interpolation=cv2.INTER_AREA
+            )
+
+        # Test frame verkleinern
 
         results = detector.process(frame)
 

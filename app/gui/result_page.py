@@ -428,7 +428,7 @@ class ResultPage(ctk.CTkFrame):
             metrics_config = SQUAT_METRICS
 
 
-        elif self.exercise == "Push-up":
+        elif self.exercise == "Push Up":
 
             metrics_config = PUSHUP_METRICS
 
