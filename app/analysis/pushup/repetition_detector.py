@@ -6,9 +6,7 @@
 - Robuste Verarbeitung fehlender Pose-Daten
 """
 
-
 from app.analysis.pushup.pushup_pose_validator import is_pushup_position
-
 
 
 # ==========================
@@ -21,14 +19,12 @@ START_ANGLE = 145
 END_ANGLE = 145
 # Ellenbogenwinkel, der zum Abschluss einer Wiederholung erreicht werden muss
 
-BOTTOM_TOLERANCE = 8
-# Erlaubte Winkelabweichung vom Tiefpunkt zur Kompensation von Messrauschen
-
-BOTTOM_CONFIRM_FRAMES = 5
-# Anzahl aufeinanderfolgender Frames zur Bestätigung des Tiefpunkts
+RISING_CONFIRM_FRAMES = 5
+# Anzahl aufeinanderfolgender steigender Frames,
+# um den Richtungswechsel zu bestätigen
 
 MIN_ROM = 50
-# Minimal erforderlicher Bewegungsumfang (Range of Motion) einer Wiederholung
+# Minimal erforderlicher Bewegungsumfang
 
 MIN_DURATION = 0.5
 # Minimale Dauer einer gültigen Wiederholung in Sekunden
@@ -37,42 +33,51 @@ MIN_DESCENT_TIME = 0.25
 # Minimale Dauer der Abwärtsbewegung in Sekunden
 
 
-
-
 def detect_pushup_repetitions(frames, fps):
-
 
     repetitions = []
 
+    # Debug-Ausgabe aktivieren/deaktivieren
+    debug = True
 
-    # Zustände:
-    #
+    # ==========================
+    # Zustände
+    # ==========================
+
     # waiting     -> Startposition suchen
     # descending  -> Abwärtsbewegung
     # ascending   -> Aufwärtsbewegung
-    #
-
-    debug = True
 
     state = "waiting"
 
-
+    # ==========================
+    # Wiederholungsdaten
+    # ==========================
 
     start = None
     bottom = None
 
     start_angle = None
 
-
+    # Aktuell niedrigster gemessener Winkel
     min_angle = float("inf")
 
-
+    # Frame des aktuell niedrigsten Winkels
     bottom_candidate = None
-    bottom_counter = 0
 
+    # Anzahl aufeinanderfolgender steigender Frames
+    rising_counter = 0
+
+    # Winkel des vorherigen Frames
+    previous_angle = None
+
+    # ==========================
+    # Frames verarbeiten
+    # ==========================
 
     for i, frame in enumerate(frames):
 
+        state_before = state
 
         # ==========================
         # Sicherheitsprüfung
@@ -80,13 +85,23 @@ def detect_pushup_repetitions(frames, fps):
 
         analysis = frame.get("analysis")
 
-
         if analysis is None:
+
             if debug:
-                 print(f"[Frame {i}] NO ANALYSIS")
+                print(
+                    f"[Frame {i:4d} | "
+                    f"{i / fps:6.2f}s] "
+                    f"State={state:<10} | "
+                    f"NO ANALYSIS"
+                )
+
+            # previous_angle NICHT verändern,
+            # da kein gültiger Winkel vorhanden ist
             continue
 
-
+        # ==========================
+        # Ellenbogenwinkel
+        # ==========================
 
         try:
 
@@ -96,54 +111,29 @@ def detect_pushup_repetitions(frames, fps):
                 ["average_angle"]
             )
 
-
         except KeyError:
+
             if debug:
-                 print(f"[Frame {i}] NO ELBOW ANGLE")
+                print(
+                    f"[Frame {i:4d} | "
+                    f"{i / fps:6.2f}s] "
+                    f"State={state:<10} | "
+                    f"NO ELBOW ANGLE"
+                )
+
             continue
 
-
-
         # ==========================
-        # Startposition prüfen
-        #
-        # NUR im waiting Zustand!
+        # Push-up Position prüfen
         # ==========================
 
         pushup_ready = False
 
-
         if state == "waiting":
-
 
             pushup_ready = is_pushup_position(
                 analysis
             )
-
-
-            print(
-                i,
-                "Pushup position:",
-                pushup_ready
-            )
-            # ==========================================================
-            # DEBUG
-            # ==========================================================
-
-            if debug:
-
-                print(
-                    f"Frame {i:4d} | "
-                    f"{i / fps:6.2f}s | "
-                    f"angle={elbow_angle:6.1f}° | "
-                    f"ready={pushup_ready} | "
-                    f"start={start} | "
-                    f"min={min_angle if min_angle != float('inf') else None} | "
-                    f"bottom_cand={bottom_candidate} | "
-                    f"counter={bottom_counter}"
-                )
-
-
 
         # ==========================
         # Start einer Wiederholung
@@ -151,10 +141,7 @@ def detect_pushup_repetitions(frames, fps):
 
         if state == "waiting":
 
-
             if pushup_ready:
-
-                pushup_active = True
 
                 start = i
 
@@ -162,18 +149,19 @@ def detect_pushup_repetitions(frames, fps):
 
                 bottom = None
 
+                # Startwinkel ist zunächst
+                # auch das aktuelle Minimum
                 min_angle = elbow_angle
 
+                bottom_candidate = i
 
-                bottom_candidate = None
+                # Steigende Frames zurücksetzen
+                rising_counter = 0
 
-                bottom_counter = 0
-
+                # Vorherigen Winkel setzen
+                previous_angle = elbow_angle
 
                 state = "descending"
-
-
-
 
         # ==========================
         # Abwärtsbewegung
@@ -181,72 +169,54 @@ def detect_pushup_repetitions(frames, fps):
 
         elif state == "descending":
 
-
-
-            # neues Minimum suchen
+            # ----------------------------------
+            # Neues Minimum gefunden
+            # ----------------------------------
 
             if elbow_angle < min_angle:
-
 
                 min_angle = elbow_angle
 
                 bottom_candidate = i
 
-                bottom_counter = 0
+                # Die bisherige steigende Bewegung
+                # ist damit unterbrochen
+                rising_counter = 0
 
+            # ----------------------------------
+            # Winkel steigt gegenüber
+            # dem vorherigen Frame
+            # ----------------------------------
 
+            elif (
+                previous_angle is not None
+                and elbow_angle > previous_angle
+            ):
 
+                rising_counter += 1
 
-            # Tiefpunkt bestätigen
+            # ----------------------------------
+            # Winkel steigt nicht mehr
+            # ----------------------------------
 
-            if bottom_candidate is not None:
+            else:
 
+                rising_counter = 0
 
+            # ----------------------------------
+            # Richtungswechsel bestätigen
+            # ----------------------------------
 
-                if elbow_angle <= (
-                    min_angle
-                    + BOTTOM_TOLERANCE
-                ):
+            if (
+                rising_counter
+                >= RISING_CONFIRM_FRAMES
+            ):
 
+                bottom = bottom_candidate
 
-                    bottom_counter += 1
+                state = "ascending"
 
-
-                else:
-
-
-                    bottom_counter = 0
-
-
-
-
-                if (
-                    bottom_counter
-                    >= BOTTOM_CONFIRM_FRAMES
-                ):
-
-
-                    bottom = bottom_candidate
-
-
-
-
-            # Richtungswechsel erkannt
-
-            if bottom is not None:
-
-
-                if elbow_angle > (
-                    min_angle
-                    + BOTTOM_TOLERANCE
-                ):
-
-
-                    state = "ascending"
-
-
-
-
+                rising_counter = 0
 
         # ==========================
         # Aufwärtsbewegung
@@ -254,128 +224,165 @@ def detect_pushup_repetitions(frames, fps):
 
         elif state == "ascending":
 
-
-
-            # Arm wieder gestreckt
-
+            # Arm wieder ausreichend gestreckt
             if elbow_angle > END_ANGLE:
-
-
 
                 if (
                     start is not None
                     and bottom is not None
                 ):
 
-
+                    # --------------------------
+                    # Bewegungsumfang
+                    # --------------------------
 
                     rom = (
                         start_angle
-                        -
-                        min_angle
+                        - min_angle
                     )
 
+                    # --------------------------
+                    # Gesamtdauer
+                    # --------------------------
 
                     duration = (
                         i - start
                     ) / fps
 
-
+                    # --------------------------
+                    # Abwärtsdauer
+                    # --------------------------
 
                     descent_time = (
                         bottom - start
                     ) / fps
 
-
-
-
                     valid = True
 
+                    # ==========================
+                    # Validierung
+                    # ==========================
 
-
-
+                    # ROM
                     if rom < MIN_ROM:
 
-
                         valid = False
 
-                        print(
-                            "Pushup verworfen: ROM zu klein"
-                        )
+                        if debug:
+                            print(
+                                f"  -> ROM zu klein: "
+                                f"{rom:.1f}° < "
+                                f"{MIN_ROM}°"
+                            )
 
-
-
-
+                    # Gesamtdauer
                     if duration < MIN_DURATION:
 
+                        valid = False
+
+                        if debug:
+                            print(
+                                f"  -> Dauer zu kurz: "
+                                f"{duration:.2f}s < "
+                                f"{MIN_DURATION}s"
+                            )
+
+                    # Abwärtsdauer
+                    if (
+                        descent_time
+                        < MIN_DESCENT_TIME
+                    ):
 
                         valid = False
 
-                        print(
-                            "Pushup verworfen: zu kurz"
-                        )
+                        if debug:
+                            print(
+                                f"  -> Abwärtsbewegung "
+                                f"zu kurz: "
+                                f"{descent_time:.2f}s < "
+                                f"{MIN_DESCENT_TIME}s"
+                            )
 
-
-
-
-                    if descent_time < MIN_DESCENT_TIME:
-
-
-                        valid = False
-
-                        print(
-                            "Pushup verworfen: Abwärtsbewegung zu kurz"
-                        )
-
-
-
-
+                    # ==========================
+                    # Ergebnis
+                    # ==========================
 
                     if valid:
-
-
 
                         repetitions.append(
                             {
                                 "start": start,
                                 "bottom": bottom,
                                 "end": i,
-
                                 "rom": rom,
-
                                 "duration": duration
                             }
                         )
 
+                        if debug:
+                            print(
+                                f"  -> REP ERKANNT | "
+                                f"start={start}, "
+                                f"bottom={bottom}, "
+                                f"end={i}, "
+                                f"ROM={rom:.1f}°, "
+                                f"duration={duration:.2f}s"
+                            )
 
-                        print(
-                            f"Rep erkannt: "
-                            f"start={start}, "
-                            f"bottom={bottom}, "
-                            f"end={i}, "
-                            f"ROM={rom:.1f}"
-                        )
+                    else:
 
+                        if debug:
+                            print(
+                                "  -> REP VERWORFEN"
+                            )
 
-
-
-                # Reset für nächste Wiederholung
+                # ==========================
+                # Reset
+                # ==========================
 
                 state = "waiting"
 
                 start = None
-
                 bottom = None
-
                 start_angle = None
 
                 min_angle = float("inf")
 
                 bottom_candidate = None
 
-                bottom_counter = 0
+                rising_counter = 0
 
+                previous_angle = None
 
+        # ==========================
+        # DEBUG FÜR JEDEN FRAME
+        # ==========================
 
+        if debug:
+
+            if min_angle == float("inf"):
+                min_display = "None"
+            else:
+                min_display = f"{min_angle:.1f}°"
+
+            print(
+                f"[Frame {i:4d} | "
+                f"{i / fps:6.2f}s] "
+                f"{state_before:<10} -> "
+                f"{state:<10} | "
+                f"angle={elbow_angle:6.1f}° | "
+                f"ready={str(pushup_ready):5} | "
+                f"start={str(start):>4} | "
+                f"min={min_display:>7} | "
+                f"bottom={str(bottom):>4} | "
+                f"candidate={str(bottom_candidate):>4} | "
+                f"rising={rising_counter}/{RISING_CONFIRM_FRAMES}"
+            )
+
+        # ==========================
+        # Vorherigen Winkel speichern
+        # ==========================
+
+        previous_angle = elbow_angle
 
     return repetitions

@@ -19,6 +19,7 @@ ARM_STRAIGHT_MIN = 140
 ARM_STRAIGHT_MAX = 200
 
 MIN_VISIBILITY = 0.85
+MIN_COUNTER = 2
 
 
 
@@ -136,14 +137,24 @@ def is_pushup_position(analysis):
 
         return False
 
+    counter = 0
+
     if (
-        (left_body_visibility < MIN_VISIBILITY and right_body_visibility < MIN_VISIBILITY)
-        or (left_shoulder_visibility < MIN_VISIBILITY and right_shoulder_visibility < MIN_VISIBILITY)
-        or (left_elbow_visibility < MIN_VISIBILITY and right_elbow_visibility < MIN_VISIBILITY)
+        (left_body_visibility > MIN_VISIBILITY or right_body_visibility > MIN_VISIBILITY)
     ):
+        counter += 1
+
+    if (left_shoulder_visibility > MIN_VISIBILITY or right_shoulder_visibility > MIN_VISIBILITY):
+        counter += 1
+
+    if (left_elbow_visibility > MIN_VISIBILITY or right_elbow_visibility > MIN_VISIBILITY):
+        counter += 1
+
+
+    if counter < MIN_COUNTER:
         print(f"FALSE: Sichtbarkeit zu gering (body(l,r)=({left_body_visibility:.2f}, {right_body_visibility:.2f}), shoulder(l,r)=({left_shoulder_visibility:.2f}, {right_shoulder_visibility:.2f}), elbow(l,r)=({left_elbow_visibility:.2f}, {right_elbow_visibility:.2f}))")
         return False
-
+    
 
     print(f"Start position valid: body={body_angle:.1f} visibility (l,r)=({left_body_visibility:.2f}, {right_body_visibility:.2f}), average_shoulder_angle={shoulder_angle:.1f} visibility (l,r)=({left_shoulder_visibility:.2f}, {right_shoulder_visibility:.2f}), arm={arm_angle:.1f} visibility (l,r)=({left_elbow_visibility:.2f}, {right_elbow_visibility:.2f})")
     return True
