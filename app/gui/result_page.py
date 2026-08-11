@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import cv2
+import time
 
 from PIL import Image
 
@@ -190,6 +191,8 @@ class ResultPage(ctk.CTkFrame):
 
             self.current_frame = 0
 
+        start_time = time.perf_counter()  # Startzeitpunkt für die Frame-Dauer
+
 
 
         data = self.frames[
@@ -254,12 +257,21 @@ class ResultPage(ctk.CTkFrame):
 
         self.current_frame += 1
 
+        # -------------------------------------
+        # Timing
+        # -------------------------------------
 
+        frame_duration = 1000 / self.fps
 
-        delay = int(
-            1000 / self.fps
+        processing_time = (
+            time.perf_counter() - start_time
+        ) * 1000
+
+        delay = max(
+            1,
+            int(frame_duration - processing_time)
         )
-
+        
 
         self.after(
             delay,

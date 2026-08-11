@@ -4,12 +4,13 @@
 """
 
 import math
-from app.pose.angle_calculator import calculate_angle
+from app.pose.angle_calculator import calculate_angle, calculate_3d_angle
 from app.pose.angle_calculator import calculate_horizontal_body_angle
 
 
-def analyze_pushup_pose(landmarks, use_visibility = False):
+def analyze_pushup_pose(landmarks):
 
+    visibility_threshold = 0.5
 
     # -----------------------------
     # Ellenbogenwinkel
@@ -49,12 +50,6 @@ def analyze_pushup_pose(landmarks, use_visibility = False):
         right_elbow_visibility
     )
 
-    """
-    average_elbow_angle = (
-        left_elbow_angle + right_elbow_angle
-    ) / 2
-    """
-
 
     # -----------------------------
     # Körperlinie relativ horizontal
@@ -72,11 +67,58 @@ def analyze_pushup_pose(landmarks, use_visibility = False):
         landmarks["right_ankle"]
     )
 
-    average_relative_body_angle = (
-        left_body_angle +
-        right_body_angle
-    ) / 2
+    left_body_visibility = min(
+        landmarks["left_shoulder"].visibility,  
+        landmarks["left_ankle"].visibility
+    )
 
+    right_body_visibility = min(
+        landmarks["right_shoulder"].visibility,
+        landmarks["right_ankle"].visibility
+    )
+
+    average_relative_body_angle = (
+        left_body_angle * left_body_visibility +    
+        right_body_angle * right_body_visibility
+    ) / (
+        left_body_visibility + right_body_visibility
+    )
+
+    # -----------------------------
+    # Hüftwinkel
+    # Schulter - Hüfte - Knöchel
+    # -----------------------------
+
+    left_hip_angle = calculate_angle(
+        landmarks["left_shoulder"],
+        landmarks["left_hip"],
+        landmarks["left_ankle"]
+    )
+
+    right_hip_angle = calculate_angle(
+        landmarks["right_shoulder"],
+        landmarks["right_hip"],
+        landmarks["right_ankle"]
+    )
+
+    left_hip_visibility = min(
+        landmarks["left_shoulder"].visibility,  
+        landmarks["left_hip"].visibility,
+        landmarks["left_ankle"].visibility
+    )
+
+    right_hip_visibility = min(
+        landmarks["right_shoulder"].visibility,
+        landmarks["right_hip"].visibility,
+        landmarks["right_ankle"].visibility
+    )
+
+    average_hip_angle = (
+        left_hip_angle * left_hip_visibility +    
+        right_hip_angle * right_hip_visibility
+    ) / (
+        left_hip_visibility + right_hip_visibility
+    )
 
 
     # -----------------------------
@@ -98,12 +140,32 @@ def analyze_pushup_pose(landmarks, use_visibility = False):
         landmarks["right_shoulder"],
         landmarks["right_elbow"]
     )
+    
+    left_shoulder_visibility = min(
+        landmarks["left_hip"].visibility,
+        landmarks["left_shoulder"].visibility,
+        landmarks["left_elbow"].visibility  
+    )
 
-
+    right_shoulder_visibility = min(
+        landmarks["right_hip"].visibility,
+        landmarks["right_shoulder"].visibility,
+        landmarks["right_elbow"].visibility
+    )
+    
     average_shoulder_angle = (
-        left_shoulder_angle +
-        right_shoulder_angle
-    ) / 2
+        left_shoulder_angle * left_shoulder_visibility +
+        right_shoulder_angle * right_shoulder_visibility
+    ) / (
+        left_shoulder_visibility + right_shoulder_visibility
+    )
+
+    if(left_shoulder_visibility > visibility_threshold and right_shoulder_visibility > visibility_threshold):
+        shoulder_angle_difference = abs(
+            left_shoulder_angle - right_shoulder_angle
+        )
+    else:
+        shoulder_angle_difference = None
 
 
 
@@ -115,7 +177,9 @@ def analyze_pushup_pose(landmarks, use_visibility = False):
             "measurements": {
 
                 "left_angle": left_elbow_angle,
+                "left_visibility": left_elbow_visibility,
                 "right_angle": right_elbow_angle,
+                "right_visibility": right_elbow_visibility,
                 "average_angle": average_elbow_angle
 
             }
@@ -128,12 +192,24 @@ def analyze_pushup_pose(landmarks, use_visibility = False):
             "measurements": {
 
                 "left_angle": left_body_angle,
+                "left_visibility": left_body_visibility,
                 "right_angle": right_body_angle,
+                "right_visibility": right_body_visibility,
                 "average_relative_angle": average_relative_body_angle
 
             }
         },
 
+        "hip": {
+
+            "measurements": {
+
+                "left_angle": left_hip_angle,
+                "right_angle": right_hip_angle,
+                "average_hip_angle": average_hip_angle
+
+            }
+        },
 
 
         "shoulder": {
@@ -143,11 +219,20 @@ def analyze_pushup_pose(landmarks, use_visibility = False):
                 "left_shoulder_angle":
                     left_shoulder_angle,
 
+                "left_visibility":
+                    left_shoulder_visibility,
+
                 "right_shoulder_angle":
                     right_shoulder_angle,
 
+                "right_visibility":
+                    right_shoulder_visibility,
+
                 "average_shoulder_angle":
-                    average_shoulder_angle
+                    average_shoulder_angle,
+
+                "shoulder_angle_difference":
+                    shoulder_angle_difference
 
             }
         }

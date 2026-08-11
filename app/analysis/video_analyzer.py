@@ -52,6 +52,8 @@ def analyze_video(video_path, analyzer_function):
                 interpolation=cv2.INTER_AREA
             )
 
+        #print(f"Frame {len(frames)}: {frame.shape[1]}x{frame.shape[0]}, FPS: {fps:.2f}")
+
         # Test frame verkleinern
 
         results = detector.process(frame)

@@ -55,7 +55,6 @@ class HomePage(ctk.CTkFrame):
             self,
             values=[
                 "Squat",
-                "Deadlift",
                 "Push Up"
             ],
             command=self.update_instruction
@@ -124,14 +123,6 @@ class HomePage(ctk.CTkFrame):
             - Ganze Bewegung sichtbar
             - Knie und Hüfte müssen erkennbar sein
             - Aufrechte Körperhaltung
-            """,
-
-            "Deadlift":
-            """
-            Deadlift:
-            - Seitliche Ansicht
-            - Stange und Körper vollständig sichtbar
-            - Rückenposition beachten
             """,
 
             "Push Up":
@@ -244,8 +235,7 @@ class HomePage(ctk.CTkFrame):
 
                     """Testing the pushup analysis with visibility consideration"""
                     pushup_analyzer = partial(
-                        analyze_pushup_pose,
-                        use_visibility=True
+                        analyze_pushup_pose
                     )
 
                     frames, fps = analyze_video(

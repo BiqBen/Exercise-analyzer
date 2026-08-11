@@ -46,12 +46,25 @@ def extract_pushup_metrics(frames, repetition, fps):
     left_body_angles = []
     right_body_angles = []
 
+    hip_angles = []
+
+    left_hip_angles = []
+    right_hip_angles = []
+
+    shoulder_angles = []
+
+    left_shoulder_angles = []
+    right_shoulder_angles = []
+
+
     for frame in rep_frames:
 
         analysis = frame["analysis"]
 
         elbow = analysis["elbow"]["measurements"]
         body = analysis["body"]["measurements"]
+        hip = analysis["hip"]["measurements"]
+        shoulder = analysis["shoulder"]["measurements"]
 
         elbow_angles.append(elbow["average_angle"])
         left_elbow_angles.append(elbow["left_angle"])
@@ -60,6 +73,14 @@ def extract_pushup_metrics(frames, repetition, fps):
         body_angles.append(body["average_relative_angle"])
         left_body_angles.append(body["left_angle"])
         right_body_angles.append(body["right_angle"])
+
+        hip_angles.append(hip["average_hip_angle"])
+        left_hip_angles.append(hip["left_angle"])
+        right_hip_angles.append(hip["right_angle"])
+
+        shoulder_angles.append(shoulder["average_shoulder_angle"])
+        left_shoulder_angles.append(shoulder["left_shoulder_angle"])
+        right_shoulder_angles.append(shoulder["right_shoulder_angle"])
 
     # -----------------------------------------
     # Ellenbogen
@@ -72,6 +93,25 @@ def extract_pushup_metrics(frames, repetition, fps):
         maximum_elbow_angle
         - minimum_elbow_angle
     )
+
+    # -----------------------------------------
+    # Schulterwinkel
+    # -----------------------------------------
+
+    minimum_shoulder_angle = min(shoulder_angles)
+    maximum_shoulder_angle = max(shoulder_angles)
+
+    shoulder_range_of_motion = (
+        maximum_shoulder_angle
+        - minimum_shoulder_angle
+    )
+
+    # -----------------------------------------
+    # Hüftwinkel
+    # -----------------------------------------
+
+    minimum_hip_angle = abs(min(hip_angles))
+    maximum_hip_angle = abs(max(hip_angles))
 
     # -----------------------------------------
     # Bottom Frame
@@ -106,6 +146,30 @@ def extract_pushup_metrics(frames, repetition, fps):
 
     bottom_body_angle = (
         bottom_analysis["body"]["measurements"]["average_relative_angle"]
+    )
+    #-----------------------------------------
+    # Symmetrie
+    #-----------------------------------------
+
+    elbow_symmetry = np.mean(
+    np.abs(
+        np.array(left_elbow_angles)
+        - np.array(right_elbow_angles)
+        )
+    )
+
+    body_symmetry = np.mean(
+        np.abs(
+            np.array(left_body_angles)
+            - np.array(right_body_angles)
+        )
+    )
+
+    shoulder_symmetry = np.mean(
+        np.abs(
+            np.array(left_shoulder_angles)
+            - np.array(right_shoulder_angles)
+        )
     )
 
     # -----------------------------------------
@@ -165,6 +229,17 @@ def extract_pushup_metrics(frames, repetition, fps):
             "average_relative_angle": np.mean(body_angles),
             "bottom_angle": bottom_body_angle,
         },
+        "hip": {
+            "minimum_angle": minimum_hip_angle,
+            "maximum_angle": maximum_hip_angle,
+            "average_angle": np.mean(hip_angles),
+        },
+         "shoulder": {
+            "minimum_angle": minimum_shoulder_angle,
+            "maximum_angle": maximum_shoulder_angle,
+            "range_of_motion": shoulder_range_of_motion,
+            "average_angle": np.mean(shoulder_angles),
+        },
 
         "timing": {
             "duration": duration,
@@ -172,6 +247,10 @@ def extract_pushup_metrics(frames, repetition, fps):
             "bottom_time": bottom_time,
             "ascent_time": ascent_time,
         },
+        "Symmetry": {
+                    "elbow_symmetry": elbow_symmetry,
+                    "body_symmetry": body_symmetry,
+                },
 
         "velocity": {
             "descent": descent_velocity,

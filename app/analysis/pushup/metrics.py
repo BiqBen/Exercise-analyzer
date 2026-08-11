@@ -6,10 +6,10 @@ PUSHUP_METRICS = [
         "key": "minimum_angle",
         "unit": "°",
 
-        "min": 40,
+        "min": 35,
         "max": 160,
 
-        "optimal": (70,110),
+        "optimal": (35,60),
 
         "description":
             "Maximum elbow flexion during push-up",
@@ -19,20 +19,18 @@ PUSHUP_METRICS = [
 
 
     {
-        "title": "Body Line Angle",
-        "category": "body",
-        "key": "maximum_angle",
+        "title": "Hip Angle",
+        "category": "hip",
+        "key": "average_angle",
         "unit": "°",
 
-        "min":0,
-        "max":40,
+        "min":140,
+        "max":200,
 
-        "optimal":(0,15),
-
-        "direction":"lower",
+        "optimal":(165,185),
 
         "description":
-            "Hip alignment during push-up",
+            "Hip angle during push-up",
 
         "show_scale":True
     },
@@ -43,12 +41,12 @@ PUSHUP_METRICS = [
         "category":"elbow",
         "key":"range_of_motion",
 
-        "unit":"",
+        "unit":"°",
         
         "min":50,
-        "max":170,
+        "max":150,
 
-        "optimal":(110,150),
+        "optimal":(90,150),
 
         "show_scale":True
     },
@@ -62,9 +60,9 @@ PUSHUP_METRICS = [
         "unit":" s",
 
         "min":0.2,
-        "max":2,
+        "max":3,
 
-        "optimal":(0.5,1.2),
+        "optimal":(1,3),
 
         "show_scale":True
     },
@@ -78,11 +76,28 @@ PUSHUP_METRICS = [
         "unit":" s",
 
         "min":0.2,
-        "max":2,
+        "max":3,
 
-        "optimal":(0.5,1),
+        "optimal":(0.4,2),
 
         "show_scale":True
+    },
+
+    {
+        "title": "Shoulder Angle (not accurate)",
+        "category": "shoulder",
+        "key": "average_angle",
+        "unit": "°",
+
+        "min": 30,
+        "max": 100,
+
+        "optimal": (35,65),
+
+        "description":
+            "Average shoulder angle during push-up, not accurate due to side view limitations",
+
+        "show_scale": True
     }
 
 ]

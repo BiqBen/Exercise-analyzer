@@ -12,11 +12,14 @@ BODY_MAX_HORIZONTAL = 20
 
 
 MIN_SHOULDER_HIP_ELBOW = 40
-MAX_SHOULDER_HIP_ELBOW = 120
+MAX_SHOULDER_HIP_ELBOW = 100
 
 
-ARM_STRAIGHT_MIN = 145
+ARM_STRAIGHT_MIN = 140
 ARM_STRAIGHT_MAX = 200
+
+MIN_VISIBILITY = 0.85
+
 
 
 
@@ -32,11 +35,35 @@ def is_pushup_position(analysis):
             ["average_relative_angle"]
         )
 
+        left_body_visibility = (
+            analysis["body"]
+            ["measurements"]
+            ["left_visibility"]
+        )
+
+        right_body_visibility = (
+            analysis["body"]
+            ["measurements"]
+            ["right_visibility"]
+        )
+
 
         shoulder_angle = (
             analysis["shoulder"]
             ["measurements"]
             ["average_shoulder_angle"]
+        )
+
+        left_shoulder_visibility = (
+            analysis["shoulder"]
+            ["measurements"]
+            ["left_visibility"]
+        )
+
+        right_shoulder_visibility = (
+            analysis["shoulder"]
+            ["measurements"]
+            ["right_visibility"]
         )
 
 
@@ -46,9 +73,20 @@ def is_pushup_position(analysis):
             ["average_angle"]
         )
 
-        print(
-            f"body={body_angle:.1f}, average_shoulder_angle={shoulder_angle:.1f}, arm={arm_angle:.1f}"
+        left_elbow_visibility = (
+            analysis["elbow"]
+            ["measurements"]
+            ["left_visibility"]
         )
+
+        right_elbow_visibility = (
+            analysis["elbow"]
+            ["measurements"]
+            ["right_visibility"]
+        )
+    
+
+        #print(f"body={body_angle:.1f}, average_shoulder_angle={shoulder_angle:.1f}, arm={arm_angle:.1f}")
 
 
     except KeyError as e:
@@ -63,7 +101,7 @@ def is_pushup_position(analysis):
     # --------------------------------
 
     if abs(body_angle) > BODY_MAX_HORIZONTAL:
-        print("FALSE: Körper nicht horizontal genug")
+        #print("FALSE: Körper nicht horizontal genug")
         return False
 
 
@@ -98,6 +136,14 @@ def is_pushup_position(analysis):
 
         return False
 
+    if (
+        (left_body_visibility < MIN_VISIBILITY and right_body_visibility < MIN_VISIBILITY)
+        or (left_shoulder_visibility < MIN_VISIBILITY and right_shoulder_visibility < MIN_VISIBILITY)
+        or (left_elbow_visibility < MIN_VISIBILITY and right_elbow_visibility < MIN_VISIBILITY)
+    ):
+        print(f"FALSE: Sichtbarkeit zu gering (body(l,r)=({left_body_visibility:.2f}, {right_body_visibility:.2f}), shoulder(l,r)=({left_shoulder_visibility:.2f}, {right_shoulder_visibility:.2f}), elbow(l,r)=({left_elbow_visibility:.2f}, {right_elbow_visibility:.2f}))")
+        return False
 
 
+    print(f"Start position valid: body={body_angle:.1f} visibility (l,r)=({left_body_visibility:.2f}, {right_body_visibility:.2f}), average_shoulder_angle={shoulder_angle:.1f} visibility (l,r)=({left_shoulder_visibility:.2f}, {right_shoulder_visibility:.2f}), arm={arm_angle:.1f} visibility (l,r)=({left_elbow_visibility:.2f}, {right_elbow_visibility:.2f})")
     return True

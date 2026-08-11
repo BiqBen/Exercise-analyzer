@@ -52,6 +52,8 @@ def detect_pushup_repetitions(frames, fps):
     # ascending   -> Aufwärtsbewegung
     #
 
+    debug = True
+
     state = "waiting"
 
 
@@ -80,6 +82,8 @@ def detect_pushup_repetitions(frames, fps):
 
 
         if analysis is None:
+            if debug:
+                 print(f"[Frame {i}] NO ANALYSIS")
             continue
 
 
@@ -94,7 +98,8 @@ def detect_pushup_repetitions(frames, fps):
 
 
         except KeyError:
-
+            if debug:
+                 print(f"[Frame {i}] NO ELBOW ANGLE")
             continue
 
 
@@ -121,6 +126,22 @@ def detect_pushup_repetitions(frames, fps):
                 "Pushup position:",
                 pushup_ready
             )
+            # ==========================================================
+            # DEBUG
+            # ==========================================================
+
+            if debug:
+
+                print(
+                    f"Frame {i:4d} | "
+                    f"{i / fps:6.2f}s | "
+                    f"angle={elbow_angle:6.1f}° | "
+                    f"ready={pushup_ready} | "
+                    f"start={start} | "
+                    f"min={min_angle if min_angle != float('inf') else None} | "
+                    f"bottom_cand={bottom_candidate} | "
+                    f"counter={bottom_counter}"
+                )
 
 
 

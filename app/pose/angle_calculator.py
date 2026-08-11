@@ -6,9 +6,10 @@
 
 import math
 
-def calculate_angle(a, b, c, return_visibility=False):
+def calculate_angle(a, b, c):
     """
-    Berechnet Winkel zwischen 3 Landmarks, gewichtet auf visibility.
+    Berechnet Winkel zwischen 3 Landmarks.
+    Der Winkel wird am Punkt b zwischen den Vektoren b -> a und b -> c berechnet.
     a, b, c = Landmark-Objekte
     """
 
@@ -28,10 +29,6 @@ def calculate_angle(a, b, c, return_visibility=False):
 
     cos_angle = dot / (mag_ba * mag_bc)
     cos_angle = max(-1.0, min(1.0, cos_angle))
-
-    #print(a.visibility, b.visibility, c.visibility)
-    if return_visibility:
-        return math.degrees(math.acos(cos_angle)), min(a.visibility, b.visibility, c.visibility)
 
     return math.degrees(math.acos(cos_angle))
 
@@ -81,3 +78,64 @@ def calculate_horizontal_body_angle(shoulder, ankle):
 
 
     return angle
+
+import math
+
+
+def calculate_3d_angle(a, b, c):
+    """
+    Berechnet den 3D-Winkel zwischen drei Landmarks.
+
+    a, b, c = Landmark-Objekte
+
+    Der Winkel wird am Punkt b zwischen
+    den Vektoren b -> a und b -> c berechnet.
+    """
+
+    # Vektor b -> a
+    ba_x = a.x - b.x
+    ba_y = a.y - b.y
+    ba_z = a.z - b.z
+
+    # Vektor b -> c
+    bc_x = c.x - b.x
+    bc_y = c.y - b.y
+    bc_z = c.z - b.z
+
+    # Skalarprodukt
+    dot = (
+        ba_x * bc_x +
+        ba_y * bc_y +
+        ba_z * bc_z
+    )
+
+    # Beträge der Vektoren
+    mag_ba = math.sqrt(
+        ba_x**2 +
+        ba_y**2 +
+        ba_z**2
+    )
+
+    mag_bc = math.sqrt(
+        bc_x**2 +
+        bc_y**2 +
+        bc_z**2
+    )
+
+    # Verhindert Division durch 0
+    if mag_ba == 0 or mag_bc == 0:
+        return 0.0
+
+    # Kosinus des Winkels
+    cos_angle = dot / (mag_ba * mag_bc)
+
+    # Numerische Fehler vermeiden
+    cos_angle = max(
+        -1.0,
+        min(1.0, cos_angle)
+    )
+
+    # Winkel in Grad
+    return math.degrees(
+        math.acos(cos_angle)
+    )
