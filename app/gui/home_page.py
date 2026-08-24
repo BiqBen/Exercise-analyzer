@@ -201,7 +201,8 @@ class HomePage(ctk.CTkFrame):
 
 
             repetitions = detect_squat_repetitions(
-                frames
+                frames, 
+                fps
             )
 
 
