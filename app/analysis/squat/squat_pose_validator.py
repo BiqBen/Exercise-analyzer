@@ -2,9 +2,10 @@
 Validierung der Squat-Ausgangsposition
 
 Kriterien:
-- Beide Beine befinden sich annähernd in einer gestreckten Position
-- Durchschnittlicher Kniewinkel entspricht einer stehenden Position
-- Linkes und rechtes Bein weisen keine zu starke Asymmetrie auf
+- Beine annähernd gestreckt
+- Linkes und rechtes Knie ungefähr symmetrisch
+- Oberkörper annähernd aufrecht
+- Ausreichende Sichtbarkeit
 """
 
 
@@ -12,10 +13,15 @@ Kriterien:
 # Konfiguration
 # ==========================================================
 
-STANDING_KNEE_MIN = 145
-STANDING_KNEE_MAX = 195
+KNEE_MIN = 145
+KNEE_MAX = 190
 
 MAX_KNEE_DIFFERENCE = 20
+
+TORSO_MAX_ANGLE = 20
+
+MIN_VISIBILITY = 0.80
+MIN_VISIBILITY_GROUPS = 2
 
 
 # ==========================================================
@@ -23,32 +29,63 @@ MAX_KNEE_DIFFERENCE = 20
 # ==========================================================
 
 def is_squat_position(analysis):
-    """
-    Prüft, ob sich die Person in einer geeigneten
-    Ausgangsposition für einen Squat befindet.
-
-    Rückgabe:
-        True  -> gültige Ausgangsposition
-        False -> keine gültige Ausgangsposition
-    """
 
     try:
 
-        measurements = (
+        # --------------------------------------------------
+        # Knie
+        # --------------------------------------------------
+
+        knee = (
             analysis["knee"]
             ["measurements"]
         )
 
-        average_angle = (
-            measurements["average_angle"]
+        average_knee_angle = (
+            knee["average_angle"]
         )
 
-        left_angle = (
-            measurements["left_angle"]
+        left_knee_angle = (
+            knee["left_angle"]
         )
 
-        right_angle = (
-            measurements["right_angle"]
+        right_knee_angle = (
+            knee["right_angle"]
+        )
+
+
+        # --------------------------------------------------
+        # Torso
+        # --------------------------------------------------
+
+        torso = (
+            analysis["torso"]
+            ["measurements"]
+        )
+
+        torso_angle = (
+            torso["average_relative_angle"]
+        )
+
+
+        # --------------------------------------------------
+        # Visibility
+        # --------------------------------------------------
+
+        left_knee_visibility = (
+            knee["left_visibility"]
+        )
+
+        right_knee_visibility = (
+            knee["right_visibility"]
+        )
+
+        left_torso_visibility = (
+            torso["left_visibility"]
+        )
+
+        right_torso_visibility = (
+            torso["right_visibility"]
         )
 
     except KeyError as e:
@@ -61,41 +98,14 @@ def is_squat_position(analysis):
 
 
     # ======================================================
-    # Durchschnittlicher Kniewinkel
+    # Knie annähernd gestreckt
     # ======================================================
 
     if not (
-        STANDING_KNEE_MIN
-        <= average_angle
-        <= STANDING_KNEE_MAX
+        KNEE_MIN
+        <= average_knee_angle
+        <= KNEE_MAX
     ):
-
-        return False
-
-
-    # ======================================================
-    # Linkes Bein
-    # ======================================================
-
-    if not (
-        STANDING_KNEE_MIN
-        <= left_angle
-        <= STANDING_KNEE_MAX
-    ):
-
-        return False
-
-
-    # ======================================================
-    # Rechtes Bein
-    # ======================================================
-
-    if not (
-        STANDING_KNEE_MIN
-        <= right_angle
-        <= STANDING_KNEE_MAX
-    ):
-
         return False
 
 
@@ -104,21 +114,49 @@ def is_squat_position(analysis):
     # ======================================================
 
     knee_difference = abs(
-        left_angle
-        - right_angle
+        left_knee_angle
+        - right_knee_angle
     )
 
     if knee_difference > MAX_KNEE_DIFFERENCE:
+        return False
 
+
+    # ======================================================
+    # Oberkörper annähernd aufrecht
+    # ======================================================
+
+    if abs(torso_angle) > TORSO_MAX_ANGLE:
+        return False
+
+
+    # ======================================================
+    # Visibility
+    # ======================================================
+
+    visibility_counter = 0
+
+    if (
+        left_knee_visibility > MIN_VISIBILITY
+        or right_knee_visibility > MIN_VISIBILITY
+    ):
+        visibility_counter += 1
+
+    if (
+        left_torso_visibility > MIN_VISIBILITY
+        or right_torso_visibility > MIN_VISIBILITY
+    ):
+        visibility_counter += 1
+
+    if visibility_counter < MIN_VISIBILITY_GROUPS:
         return False
 
 
     print(
-        f"Start position valid: "
-        f"knee={average_angle:.1f}° "
-        f"left={left_angle:.1f}° "
-        f"right={right_angle:.1f}° "
-        f"difference={knee_difference:.1f}°"
+        f"Squat start position valid: "
+        f"knee={average_knee_angle:.1f}° "
+        f"knee_diff={knee_difference:.1f}° "
+        f"torso={torso_angle:.1f}°"
     )
 
     return True

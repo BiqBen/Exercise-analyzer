@@ -68,7 +68,7 @@ def extract_squat_metrics(frames, repetition, fps):
         )
 
         torso_angles.append(
-            torso["lean_angle"]
+            torso["average_relative_angle"]
         )
 
     # -----------------------------------------
@@ -115,7 +115,7 @@ def extract_squat_metrics(frames, repetition, fps):
     )
 
     bottom_torso_angle = (
-        bottom_analysis["torso"]["measurements"]["lean_angle"]
+        bottom_analysis["torso"]["measurements"]["average_relative_angle"]
     )
 
     max_hip_flexion = (

@@ -51,12 +51,6 @@ def analyze_squat_pose(landmarks):
         right_knee_visibility
     )
 
-    """
-    avg_knee_angle = (
-        left_knee_angle +
-        right_knee_angle
-    ) / 2
-    """
 
     if(left_knee_visibility > visibility_threshold and right_knee_visibility > visibility_threshold):
         knee_angle_diff = abs(
@@ -103,10 +97,25 @@ def analyze_squat_pose(landmarks):
         landmarks["right_knee"]
     )
 
+    left_hip_visibility = min(
+        landmarks["left_shoulder"].visibility,
+        landmarks["left_hip"].visibility,
+        landmarks["left_knee"].visibility
+    )
+
+    right_hip_visibility = min(
+        landmarks["right_shoulder"].visibility,
+        landmarks["right_hip"].visibility,
+        landmarks["right_knee"].visibility
+    )
+
     avg_hip_angle = (
-        left_hip_angle +
-        right_hip_angle
-    ) / 2
+        left_hip_angle * left_hip_visibility +
+        right_hip_angle * right_hip_visibility
+    ) / (
+        left_hip_visibility +
+        right_hip_visibility
+    )
 
 
     # --------------------------
@@ -123,10 +132,23 @@ def analyze_squat_pose(landmarks):
         landmarks["right_hip"]
     )
 
+    left_torso_visibility = min(
+        landmarks["left_shoulder"].visibility,
+        landmarks["left_hip"].visibility
+    )
+
+    right_torso_visibility = min(
+        landmarks["right_shoulder"].visibility,
+        landmarks["right_hip"].visibility
+    )
+
     avg_torso_angle = (
-        left_torso_angle +
-        right_torso_angle
-    ) / 2
+        left_torso_angle * left_torso_visibility +
+        right_torso_angle * right_torso_visibility
+    ) / (
+        left_torso_visibility +
+        right_torso_visibility
+    )
 
     # --------------------------
     # Ergebnisse
@@ -145,7 +167,9 @@ def analyze_squat_pose(landmarks):
         "knee": {
             "measurements": {
                 "left_angle": left_knee_angle,
+                "left_visibility": left_knee_visibility,
                 "right_angle": right_knee_angle,
+                "right_visibility": right_knee_visibility,
                 "average_angle": avg_knee_angle
             }
         },
@@ -153,14 +177,20 @@ def analyze_squat_pose(landmarks):
         "hip": {
             "measurements": {
                 "left_angle": left_hip_angle,
+                "left_visibility": left_hip_visibility,
                 "right_angle": right_hip_angle,
+                "right_visibility": right_hip_visibility,
                 "average_angle": avg_hip_angle
             }
         },
 
         "torso": {
             "measurements": {
-                "lean_angle": avg_torso_angle
+                "left_angle": left_torso_angle,
+                "left_visibility": left_torso_visibility,
+                "right_angle": right_torso_angle,
+                "right_visibility": right_torso_visibility,
+                "average_relative_angle": avg_torso_angle
             }
         },
 
