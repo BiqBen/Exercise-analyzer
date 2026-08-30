@@ -35,18 +35,16 @@ from app.analysis.pushup.pushup_pose_validator import (
 
 END_ANGLE = 130
 
-TREND_WINDOW = 10
-MIN_TREND_COUNT = 7
+TREND_WINDOW = 12
+MIN_TREND_COUNT = 9
 ANGLE_TOLERANCE = 0.4
 
-START_MOVEMENT_THRESHOLD = 0.8
-READY_BUFFER_SIZE = 30
-
+START_MOVEMENT_THRESHOLD = 0.4
 TOP_END_WINDOW = 6
 TOP_END_MAX_RANGE = 2.0
 
 TOP_STABLE_FRAMES = 10
-TOP_STABLE_TOLERANCE = 1.0
+TOP_STABLE_TOLERANCE = 2.0
 
 MIN_ROM = 50
 MIN_DURATION = 0.5
@@ -256,15 +254,9 @@ def detect_pushup_repetitions(frames, fps):
         maxlen=TREND_WINDOW
     )
 
-    ready_buffer = deque(
-        maxlen=READY_BUFFER_SIZE
-    )
-
     top_end_window = deque(
         maxlen=TOP_END_WINDOW
     )
-
-    next_descent_angles = []
 
     top_stable_count = 0
 
@@ -319,8 +311,13 @@ def detect_pushup_repetitions(frames, fps):
         # ==================================================
 
         angle_window.append(
-            elbow_angle
+            (i, elbow_angle)
         )
+
+        trend_angles = [
+            angle
+            for _, angle in angle_window
+        ]
 
         (
             trend,
@@ -328,7 +325,7 @@ def detect_pushup_repetitions(frames, fps):
             falling_count,
             neutral_count
         ) = get_angle_trend(
-            angle_window,
+            trend_angles,
             TREND_WINDOW,
             MIN_TREND_COUNT,
             ANGLE_TOLERANCE
@@ -343,16 +340,10 @@ def detect_pushup_repetitions(frames, fps):
 
             if is_pushup_position(analysis):
 
-                ready_buffer.clear()
-
-                ready_buffer.append(
-                    (i, elbow_angle)
-                )
-
                 angle_window.clear()
 
                 angle_window.append(
-                    elbow_angle
+                    (i, elbow_angle)
                 )
 
                 state = "ready"
@@ -364,17 +355,13 @@ def detect_pushup_repetitions(frames, fps):
 
         elif state == "ready":
 
-            ready_buffer.append(
-                (i, elbow_angle)
-            )
-
             if trend == "falling":
 
                 (
                     start,
                     start_angle
                 ) = find_descent_start(
-                    ready_buffer,
+                    angle_window,
                     START_MOVEMENT_THRESHOLD
                 )
 
@@ -384,7 +371,7 @@ def detect_pushup_repetitions(frames, fps):
 
                 descent_values = [
                     value
-                    for value in ready_buffer
+                    for value in angle_window
                     if value[0] >= start
                 ]
 
@@ -407,8 +394,6 @@ def detect_pushup_repetitions(frames, fps):
 
                 max_angle = None
                 max_angle_frame = None
-
-                next_descent_angles.clear()
 
                 top_end_window.clear()
 
@@ -453,7 +438,7 @@ def detect_pushup_repetitions(frames, fps):
                 angle_window.clear()
 
                 angle_window.append(
-                    elbow_angle
+                    (i, elbow_angle)
                 )
 
                 state = "ascending"
@@ -482,7 +467,7 @@ def detect_pushup_repetitions(frames, fps):
                 angle_window.clear()
 
                 angle_window.append(
-                    elbow_angle
+                    (i, elbow_angle)
                 )
 
                 top_end_window.clear()
@@ -490,10 +475,6 @@ def detect_pushup_repetitions(frames, fps):
                 top_end_window.append(
                     (i, elbow_angle)
                 )
-
-                next_descent_angles = [
-                    (i, elbow_angle)
-                ]
 
                 top_stable_count = 0
 
@@ -542,15 +523,6 @@ def detect_pushup_repetitions(frames, fps):
 
 
             # ----------------------------------------------
-            # mögliche nächste Abwärtsbewegung
-            # ----------------------------------------------
-
-            next_descent_angles.append(
-                (i, elbow_angle)
-            )
-
-
-            # ----------------------------------------------
             # Stabilität oben
             # ----------------------------------------------
 
@@ -593,7 +565,7 @@ def detect_pushup_repetitions(frames, fps):
 
                 valid_next_angles = [
                     value
-                    for value in next_descent_angles
+                    for value in angle_window
                     if (
                         max_angle_frame is not None
                         and value[0] >= max_angle_frame
@@ -643,18 +615,14 @@ def detect_pushup_repetitions(frames, fps):
 
                 angle_window.clear()
 
-                for _, angle in (
+                for frame_index, angle in (
                     descent_values[-TREND_WINDOW:]
                 ):
                     angle_window.append(
-                        angle
+                        (frame_index, angle)
                     )
 
-                ready_buffer.clear()
-
                 top_end_window.clear()
-
-                next_descent_angles.clear()
 
                 top_stable_count = 0
 
@@ -688,21 +656,13 @@ def detect_pushup_repetitions(frames, fps):
 
                 if saved:
 
-                    ready_buffer.clear()
-
-                    ready_buffer.append(
-                        (i, elbow_angle)
-                    )
-
                     angle_window.clear()
 
                     angle_window.append(
-                        elbow_angle
+                        (i, elbow_angle)
                     )
 
                     top_end_window.clear()
-
-                    next_descent_angles.clear()
 
                     start = None
                     start_angle = None
