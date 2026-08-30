@@ -1,14 +1,13 @@
 import customtkinter as ctk
 from tkinter import filedialog
-from functools import partial
 
 from app.analysis.video_analyzer import analyze_video
 from app.analysis.squat.pose_analyzer import analyze_squat_pose
 from app.analysis.pushup.pose_analyzer import analyze_pushup_pose
 from app.analysis.squat.repetition_detector import detect_squat_repetitions
 from app.analysis.pushup.repetition_detector import detect_pushup_repetitions
-from app.analysis.squat.repetition_analyzer import analyze_squat_repetition
-from app.analysis.pushup.repetition_analyzer import analyze_pushup_repetition
+from app.analysis.pushup.repetition_analyzer import extract_pushup_metrics
+from app.analysis.squat.repetition_analyzer import extract_squat_metrics
 
 
 
@@ -211,45 +210,37 @@ class HomePage(ctk.CTkFrame):
             )
 
 
+
             results = []
-
-
+            
             for repetition in repetitions:
-
-                result = analyze_squat_repetition(
+                metric = extract_squat_metrics(
                     frames,
                     repetition,
                     fps
                 )
 
-                results.append(result)
-
+                if metric is not None:
+                    results.append({
+                        "frames": repetition,
+                        "metrics": metric
+                    })
 
             self.controller.show_results(
-                results,
-                frames,
-                fps,
-                exercise
-            )
+                                    results,
+                                    frames,
+                                    fps,
+                                    exercise
+                                )
+
 
         elif exercise == "Push Up":
 
-                    """Testing the pushup analysis with visibility consideration"""
-                    pushup_analyzer = partial(
-                        analyze_pushup_pose
-                    )
 
-                    frames, fps = analyze_video(
-                        self.video_path,
-                        pushup_analyzer
-                    )
-
-                    """
                     frames, fps = analyze_video(
                         self.video_path,
                         analyze_pushup_pose
                     )
-                    """
         
         
                     print("Analyse abgeschlossen")
@@ -273,25 +264,26 @@ class HomePage(ctk.CTkFrame):
                     print(
                         f"Wiederholungen erkannt: {len(repetitions)}"
                     )
-        
-        
+
+
                     results = []
-        
-        
+
                     for repetition in repetitions:
-        
-                        result = analyze_pushup_repetition(
+                        metric = extract_pushup_metrics(
                             frames,
                             repetition,
                             fps
                         )
-        
-                        results.append(result)
-        
-        
+
+                        if metric is not None:
+                            results.append({
+                                "frames": repetition,
+                                "metrics": metric
+                            })
+
                     self.controller.show_results(
-                        results,
-                        frames,
-                        fps,
-                        exercise
-                    )
+                                            results,
+                                            frames,
+                                            fps,
+                                            exercise
+                                        )

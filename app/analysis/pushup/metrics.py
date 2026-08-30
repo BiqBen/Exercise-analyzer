@@ -6,31 +6,31 @@ PUSHUP_METRICS = [
         "key": "minimum_angle",
         "unit": "°",
 
-        "min": 35,
-        "max": 160,
+        "min": 40,
+        "max": 140,
 
-        "optimal": (35,60),
+        "optimal": (40,90),
 
         "description":
-            "Maximum elbow flexion during push-up",
+            "minimum elbow angle during push-up",
 
         "show_scale": True
     },
 
 
     {
-        "title": "Hip Angle",
+        "title": "Maximum Hip Flexion",
         "category": "hip",
-        "key": "average_angle",
+        "key": "maximum_flexion",
         "unit": "°",
 
-        "min":140,
-        "max":200,
+        "min":0,
+        "max":50,
 
-        "optimal":(165,185),
+        "optimal":(0,10),
 
         "description":
-            "Hip angle during push-up",
+            "Maximum hip flexion during push-up",
 
         "show_scale":True
     },
@@ -43,7 +43,7 @@ PUSHUP_METRICS = [
 
         "unit":"°",
         
-        "min":50,
+        "min":40,
         "max":150,
 
         "optimal":(90,150),
@@ -51,6 +51,20 @@ PUSHUP_METRICS = [
         "show_scale":True
     },
 
+{
+        "title":"Duration",
+        "category":"timing",
+        "key":"duration",
+
+        "unit":" s",
+
+        "min":0.6,
+        "max":8,
+
+        "optimal":(1.5,6),
+
+        "show_scale":True
+    },
 
     {
         "title":"Descent Time",
@@ -60,7 +74,7 @@ PUSHUP_METRICS = [
         "unit":" s",
 
         "min":0.2,
-        "max":3,
+        "max":4,
 
         "optimal":(1,3),
 
@@ -76,9 +90,9 @@ PUSHUP_METRICS = [
         "unit":" s",
 
         "min":0.2,
-        "max":3,
+        "max":4,
 
-        "optimal":(0.4,2),
+        "optimal":(0.5,3),
 
         "show_scale":True
     },
@@ -89,10 +103,10 @@ PUSHUP_METRICS = [
         "key": "average_angle",
         "unit": "°",
 
-        "min": 30,
+        "min": 20,
         "max": 100,
 
-        "optimal": (35,65),
+        "optimal": (20,60),
 
         "description":
             "Average shoulder angle during push-up, not accurate due to side view limitations",

@@ -3,8 +3,7 @@
 - Berechnung biomechanischer Parameter
 """
 
-import math
-from app.pose.angle_calculator import calculate_angle, calculate_3d_angle
+from app.pose.angle_calculator import calculate_angle, calculate_angle_xz
 from app.pose.angle_calculator import calculate_horizontal_body_angle
 
 
@@ -128,14 +127,14 @@ def analyze_pushup_pose(landmarks):
     # Hüfte ---- Schulter ---- Ellenbogen
     # -----------------------------
 
-    left_shoulder_angle = calculate_angle(
+    left_shoulder_angle = calculate_angle_xz(
         landmarks["left_hip"],
         landmarks["left_shoulder"],
         landmarks["left_elbow"]
     )
 
 
-    right_shoulder_angle = calculate_angle(
+    right_shoulder_angle = calculate_angle_xz(
         landmarks["right_hip"],
         landmarks["right_shoulder"],
         landmarks["right_elbow"]

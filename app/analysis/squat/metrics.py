@@ -6,11 +6,9 @@ SQUAT_METRICS = [
         "key": "minimum_angle",
         "unit": "°",
 
-        # tiefe Kniebeugung
-        # ca. 60-100° gelten als sinnvoller Bereich
-        "min": 30,
-        "max": 120,
-        "optimal": (50, 100),
+        "min": 45,
+        "max": 160,
+        "optimal": (45, 90),
 
         "description":
             "Knee flexion at lowest squat position",
@@ -27,11 +25,11 @@ SQUAT_METRICS = [
 
         # negative Werte:
         # Hüfte tiefer als Knie
-        "min": -0.1,
-        "max": 0.05,
-        "optimal": (-0.08, -0.01),
+        "min": -0.3,
+        "max": 0.3,
+        "optimal": (0, 0.3),
 
-        "direction": "range",
+        "direction": "higher",
 
         "description":
             "Hip position relative to knee",
@@ -39,26 +37,21 @@ SQUAT_METRICS = [
         "show_scale": True
     },
 
-
     {
-        "title": "Maximum Hip Flexion",
-        "category": "hip",
-        "key": "maximum_flexion",
-        "unit": "°",
-
-        # typische Squat-Hüftflexion
-        # nicht maximale Flexion im Stand!
-        "min": 80,
-        "max": 160,
-        "optimal": (90, 140),
-
-        "direction": "range",
-
-        "description":
-            "Maximum hip flexion during squat",
-
-        "show_scale": True
+            "title": "Range of Motion",
+            "category":"knee",
+            "key":"range_of_motion",
+    
+            "unit":"°",
+            
+            "min":50,
+            "max":150,
+    
+            "optimal":(90,150),
+    
+            "show_scale":True
     },
+
 
 
     {
@@ -72,7 +65,7 @@ SQUAT_METRICS = [
         # zu viel = starke Hüftdominanz
         "min": 0,
         "max": 70,
-        "optimal": (15, 55),
+        "optimal": (10, 45),
 
         "direction": "range",
 
@@ -80,6 +73,20 @@ SQUAT_METRICS = [
             "Forward torso inclination",
 
         "show_scale": True
+    },
+    {
+        "title":"Duration",
+        "category":"timing",
+        "key":"duration",
+
+        "unit":" s",
+
+        "min":1,
+        "max":8,
+
+        "optimal":(1.5,6),
+
+        "show_scale":True
     },
 
 
@@ -90,9 +97,9 @@ SQUAT_METRICS = [
         "unit": " s",
 
         # kontrollierte Abwärtsphase
-        "min": 0.2,
-        "max": 2.0,
-        "optimal": (0.6, 1.2),
+        "min": 0.5,
+        "max": 5,
+        "optimal": (1, 3),
 
         "direction": "range",
 
@@ -104,35 +111,14 @@ SQUAT_METRICS = [
 
 
     {
-        "title": "Bottom Time",
-        "category": "timing",
-        "key": "bottom_time",
-        "unit": " s",
-
-        # kurze Pause ist technisch sauber
-        # aber kein langer Aufenthalt
-        "min": 0,
-        "max": 1.5,
-        "optimal": (0.1, 0.6),
-
-        "direction": "range",
-
-        "description":
-            "Time spent at squat depth",
-
-        "show_scale": True
-    },
-
-
-    {
         "title": "Ascent Time",
         "category": "timing",
         "key": "ascent_time",
         "unit": " s",
 
-        "min": 0.2,
-        "max": 2.0,
-        "optimal": (0.5, 1.0),
+        "min": 0.3,
+        "max": 5,
+        "optimal": (0.5, 3),
 
         "direction": "range",
 
@@ -144,47 +130,7 @@ SQUAT_METRICS = [
 
 
     {
-        "title": "Descent Velocity",
-        "category": "velocity",
-        "key": "descent",
-        "unit": "°/s",
-
-        # Geschwindigkeit alleine ist nicht gut/schlecht
-        # nur Information
-        "min": 50,
-        "max": 300,
-        "optimal": (100, 220),
-
-        "direction": "range",
-
-        "description":
-            "Lowering movement speed",
-
-        "show_scale": True
-    },
-
-
-    {
-        "title": "Ascent Velocity",
-        "category": "velocity",
-        "key": "ascent",
-        "unit": "°/s",
-
-        "min": 50,
-        "max": 350,
-        "optimal": (150, 280),
-
-        "direction": "range",
-
-        "description":
-            "Rising movement speed",
-
-        "show_scale": True
-    },
-
-
-    {
-        "title": "Stability",
+        "title": "Symmetrie",
         "category": "stability",
         "key": "average_difference",
         "unit": "°",
@@ -193,7 +139,7 @@ SQUAT_METRICS = [
         # kleiner = besser
         "min": 0,
         "max": 20,
-        "optimal": (0, 7),
+        "optimal": (0, 2),
 
         "direction": "lower",
 

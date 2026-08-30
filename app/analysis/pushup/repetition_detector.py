@@ -200,13 +200,6 @@ def finalize_repetition(
             "start": start,
             "bottom": bottom,
             "end": end,
-            "rom": rom,
-            "duration": duration,
-            "descent_time": descent_time,
-            "ascend_time": ascend_time,
-            "min_angle": min_angle,
-            "max_angle": max_angle,
-            "max_angle_frame": max_angle_frame,
         }
     )
 

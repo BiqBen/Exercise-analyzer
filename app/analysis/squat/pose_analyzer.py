@@ -84,7 +84,7 @@ def analyze_squat_pose(landmarks):
     # --------------------------
     # Hüftwinkel
     # --------------------------
-
+    """
     left_hip_angle = calculate_angle(
         landmarks["left_shoulder"],
         landmarks["left_hip"],
@@ -96,7 +96,18 @@ def analyze_squat_pose(landmarks):
         landmarks["right_hip"],
         landmarks["right_knee"]
     )
+    """
 
+    left_hip_angle = calculate_vertical_torso_angle(
+        landmarks["left_hip"],
+        landmarks["left_knee"]
+    )
+
+    right_hip_angle = calculate_vertical_torso_angle(
+        landmarks["right_hip"],
+        landmarks["right_knee"]
+    )
+    
     left_hip_visibility = min(
         landmarks["left_shoulder"].visibility,
         landmarks["left_hip"].visibility,

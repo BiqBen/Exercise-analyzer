@@ -32,6 +32,35 @@ def calculate_angle(a, b, c):
 
     return math.degrees(math.acos(cos_angle))
 
+def calculate_angle_xz(a, b, c):
+    """
+    Berechnet den Winkel zwischen drei Landmarks in der x-z-Ebene.
+
+    Der Winkel wird am Punkt b zwischen den Vektoren
+    b -> a und b -> c berechnet.
+
+    a, b, c: Landmark-Objekte mit x- und z-Koordinaten
+    """
+
+    ba_x = a.x - b.x
+    ba_z = a.z - b.z
+
+    bc_x = c.x - b.x
+    bc_z = c.z - b.z
+
+    dot = ba_x * bc_x + ba_z * bc_z
+
+    mag_ba = (ba_x**2 + ba_z**2) ** 0.5
+    mag_bc = (bc_x**2 + bc_z**2) ** 0.5
+
+    if mag_ba * mag_bc == 0:
+        return 0.0
+
+    cos_angle = dot / (mag_ba * mag_bc)
+    cos_angle = max(-1.0, min(1.0, cos_angle))
+
+    return math.degrees(math.acos(cos_angle))
+
 def calculate_vertical_torso_angle(shoulder, hip):
     """
     Berechnet die Oberkörperneigung relativ zur Vertikalen.
