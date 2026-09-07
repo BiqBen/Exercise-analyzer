@@ -11,7 +11,7 @@ The Exercise Analyzer processes recorded workout videos, tracks body landmarks, 
 
 | Exercise selection and video upload | Repetition-by-repetition results |
 | --- | --- |
-| pictures/Home_page.png| pictures/Result_page.png |
+| ![Exercise selection and video upload](pictures/Home_page.png) | ![Repetition analysis results](pictures/Result_page.png) |
 
 For the strongest first impression, add a short GIF here showing the complete workflow:
 
