@@ -4,7 +4,7 @@
 
 The Exercise Analyzer processes recorded workout videos, tracks body landmarks, separates the movement into individual repetitions, and evaluates each repetition using exercise-specific quality criteria. The current prototype supports **push-ups** and **squats** and presents the results in an interactive desktop interface.
 
-> This project was developed as a university project in Computer Engineering and serves as a modular prototype for camera-based movement analysis.
+> This project serves as a modular prototype for camera-based movement analysis.
 
 ## Showcase
 
