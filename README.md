@@ -201,5 +201,4 @@ The system is intentionally designed as a prototype: its modular structure provi
 ## Author
 
 **Ben Engelhardt**  
-Computer Engineering graduate based in Stuttgart, Germany
 
