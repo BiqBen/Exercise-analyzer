@@ -13,10 +13,6 @@ The Exercise Analyzer processes recorded workout videos, tracks body landmarks, 
 | --- | --- |
 | ![Exercise selection and video upload](pictures/Home_page.png) | ![Repetition analysis results](pictures/Result_page.png) |
 
-For the strongest first impression, add a short GIF here showing the complete workflow:
-
-`Upload video → Detect pose → Identify repetitions → Display quality metrics`
-
 ## What the Application Does
 
 1. The user selects an exercise and uploads a recorded video.
