@@ -153,8 +153,6 @@ Start the application:
 python main.py
 ```
 
-> Replace the repository URL and start command if your repository or entry-point filename differs.
-
 ## Usage
 
 1. Start the desktop application.
