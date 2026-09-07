@@ -6,9 +6,9 @@ SQUAT_METRICS = [
         "key": "minimum_angle",
         "unit": "°",
 
-        "min": 45,
+        "min": 35,
         "max": 160,
-        "optimal": (45, 90),
+        "optimal": (35, 90),
 
         "description":
             "Knee flexion at lowest squat position",
@@ -23,7 +23,7 @@ SQUAT_METRICS = [
         "key": "difference",
         "unit": "",
 
-        # negative Werte:
+        # positive Werte:
         # Hüfte tiefer als Knie
         "min": -0.3,
         "max": 0.3,

@@ -1,7 +1,6 @@
 """
 - Berechnung biomechanischer Bewegungsparameter
 - Analyse einer kompletten Push-up-Wiederholung
-- Keine Bewertung, nur Messwerte
 """
 
 import numpy as np
@@ -16,10 +15,6 @@ def extract_pushup_metrics(frames, repetition, fps):
     end = repetition["end"]
     bottom = repetition["bottom"]
 
-    # -----------------------------------------
-    # Nur gültige Frames der Wiederholung
-    # -----------------------------------------
-
     rep_frames = []
 
     for frame in frames[start:end + 1]:
@@ -32,9 +27,8 @@ def extract_pushup_metrics(frames, repetition, fps):
     if len(rep_frames) == 0:
         return None
 
-    # -----------------------------------------
+
     # Winkel sammeln
-    # -----------------------------------------
 
     elbow_angles = []
 

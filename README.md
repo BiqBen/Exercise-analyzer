@@ -8,11 +8,10 @@ The Exercise Analyzer processes recorded workout videos, tracks body landmarks, 
 
 ## Showcase
 
-<!-- Replace these placeholders with screenshots or a short GIF from your application. -->
 
 | Exercise selection and video upload | Repetition-by-repetition results |
 | --- | --- |
-| `Add screenshot: assets/home-page.png` | `Add screenshot: assets/results-page.png` |
+| pictures/Home_page.png| pictures/Result_page.png |
 
 For the strongest first impression, add a short GIF here showing the complete workflow:
 

@@ -13,7 +13,7 @@ from app.pose.pose_extractor import extract_landmarks
 
 def analyze_video(video_path, analyzer_function):
 
-    MAX_SIZE = 640
+    MAX_SIZE = 100000
 
     cap = cv2.VideoCapture(video_path)
 
